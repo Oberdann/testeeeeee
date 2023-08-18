@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Candidato {
+  id                  String           @id @default(uuid())
+  name                String
+  middle_name         String
+  email               String           @unique
+  phone               String
+  cell_phone          String
+  address             String
+  gender              String
+  pcd                 String
+  state               String
+  country             String
+  city                String
+  seniority           String
+  neighborhood        String
+  review              String
+  blacklist           Boolean          @default(false)
+  review_blacklist    String
+  latest_company      String
+  salary_expectation  Int
+  salary_actual       Int?
+  disponibility_begin DateTime
+  travel              Boolean
+  change_availability Boolean
+  alocation           String
+  schooling           String
+  skills              String[]
+  languages           String[]
+  language_level      String[]
+  social_media        String
+  weblinks            String
+  status              String
+  vagas               Candidato_Vaga[]
+  entrevistas         Entrevista[]
+}
+
+model Vaga {
+  id             String            @id @default(uuid())
+  candidates     Candidato_Vaga[]
+  habilities     Vaga_Habilidade[]
+  title          String
+  schooling      String
+  language       String[]
+  language_level String[]
+  accept_pcd     Boolean
+  country        String
+  state          String
+  city           String
+  neighborhood   String
+  alocation      String
+  travel         Boolean
+  duration       Int
+  hiring_type    String
+  quantity       Int
+  job_owner      String
+  company        Empresa          @relation(fields: [company_id], references: [id])
+  company_id     String
+  priority       String
+  status         String
+  description    String
+  tags           String
+  internal_notes String
+  salary         Int
+}
+
+model Empresa {
+  id          String  @id @default(uuid())
+  name        String
+  addres      String
+  phone       String
+  email       String  @unique
+  website     String?
+  industry    String
+  size        String
+  description String
+  Vaga        Vaga[]
+}
+
+model Candidato_Vaga {
+  vaga         Vaga      @relation(fields: [vaga_id], references: [id])
+  candidato_id String
+  vaga_id      String
+  candidato    Candidato @relation(fields: [candidato_id], references: [id])
+
+  @@id([candidato_id, vaga_id])
+}
+
+model Habilidade {
+  id                String            @id @default(uuid())
+  name              String            @unique
+  vagas_habilidades Vaga_Habilidade[]
+}
+
+model Vaga_Habilidade {
+  id            String @id @default(uuid())
+  vaga_id       String
+  habilidade_id String
+
+  vaga     Vaga       @relation(fields: [vaga_id], references: [id])
+  hability Habilidade @relation(fields: [habilidade_id], references: [id])
+
+  @@unique([vaga_id, habilidade_id])
+}
+
+model Entrevista {
+  id               String     @id @default(uuid())
+  candidate_id     String
+  candidate        Candidato? @relation(fields: [candidate_id], references: [id])
+  entrevistador_id String
+}
